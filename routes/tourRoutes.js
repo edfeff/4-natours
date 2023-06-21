@@ -2,7 +2,7 @@ const { Router } = require('express')
 const tourController = require('../controllers/tourController')
 const router = Router();
 
-router.param('id', tourController.checkID)
+// router.param('id', tourController.checkID)
 
 
 router.param('json', (req, res, next, val) => {

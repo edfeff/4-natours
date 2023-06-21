@@ -1,8 +1,10 @@
-const exp = require('constants')
-const fs = require('fs')
-const tourSimpleFile = `${__dirname}/../dev-data/data/tours-simple.json`
-const tours = JSON.parse(fs.readFileSync(tourSimpleFile)).filter(el => !el.isDelete)
-
+const Tour = require('./../models/tourModel')
+const sendErr = (res, err) => {
+  res.status(400).json({status: "fail", message: err})
+}
+const sendData = (res, data) => {
+  res.status(200).json({status: "success", data: data})
+}
 exports.checkBody = (req, res, next) => {
   if (!req.body || !req.body.name || !req.body.price) {
     return res.status(400).json({
@@ -13,72 +15,53 @@ exports.checkBody = (req, res, next) => {
   next()
 }
 
-exports.checkID = (req, res, next, val) => {
-  const tour = tours.find(t => t.id == val);
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: "Invalid Id"
-    });
+exports.getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find()
+    sendData(res, {tours})
+  } catch (err) {
+    sendErr(res, err)
   }
-  next()
 }
 
-exports.getAllTours = (req, res) => {
-  res.status(200).json({
-    status: 'sucess',
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
+exports.getTour = async (req, res) => {
+  const {id} = req.params;
+  try {
+    const tour = await Tour.findById(id);
+    sendData(res, {tour})
+  } catch (err) {
+    sendErr(res, err);
+  }
 }
-exports.getTour = (req, res) => {
-  const { id } = req.params;
-  const tour = tours.find(t => t.id == id);
-  res.status(200).json({
-    status: 'sucess',
-    data: {
-      tour
-    }
-  });
+
+exports.createTour = async (req, res) => {
+  try {
+    const tour = await Tour.create(req.body);
+    sendData(res, {tour});
+  } catch (err) {
+    sendErr(req, err);
+  }
 }
-exports.createTour = (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
-  tours.push(newTour);
-  fs.writeFile(tourSimpleFile, JSON.stringify(tours), err => {
-    res.status(201).json({
-      status: 'sucess',
-      data: {
-        tour: newTour
-      }
-    })
-  })
+exports.updateTour = async (req, res) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,
+        {
+          new: true,
+          runValidators: true
+        }
+    )
+    sendData(res, {tour})
+  } catch (err) {
+    sendErr(err)
+  }
+
 }
-exports.updateTour = (req, res) => {
-  const { id } = req.params;
-  const tour = tours.find(t => t.id == id);
-  const newTour = Object.assign(tour, req.body);
-  const index = tours.indexOf(tour);
-  tours[index] = newTour;
-  fs.writeFile(tourSimpleFile, JSON.stringify(tours), err => {
-    res.status(200).json({
-      status: 'sucess',
-      data: {
-        tour: newTour
-      }
-    })
-  })
+exports.deleteTour = async (req, res) => {
+  try {
+    const tour = await Tour.findByIdAndDelete(req.params.id);
+    sendData(res, {tour})
+  } catch (err) {
+    sendErr(res, err);
+  }
 }
-exports.deleteTour = (req, res) => {
-  const { id } = req.params;
-  const tour = tours.find(t => t.id == id);
-  tour.isDelete = true;
-  fs.writeFile(tourSimpleFile, JSON.stringify(tours), err => {
-    res.status(204).json({
-      status: "success",
-      data: null
-    })
-  })
-}
+

@@ -1,14 +1,8 @@
-const mongoose = require('mongoose')
 const express = require('express')
 const morgan = require('morgan') //HTTP request logger middleware for node.js https://www.npmjs.com/package/morgan
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
 
-mongoose.connect(process.env.DATABASE, { autoCreate: true, useNewUrlParser: true, useUnifiedTopology: true },)
-  .then(mongo => {
-    console.log(mongo)
-  })
-  .catch(err => { console.log(err) })
 
 //1>  中间件
 const app = express();
