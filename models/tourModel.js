@@ -19,14 +19,17 @@ const tourSchema = new mongoose.Schema({
     type: Number
   },
   maxGroupSize: Number,
-  difficulty: String,
+  difficulty: {
+    type: String,
+    enum: ["easy", "medium", "difficult"]
+  },
   ratingsAverage: Number,
   ratingsQuantity: Number,
   summary: String,
   description: String,
   imageCover: String,
-  images: Array,
-  startDates: Array
+  images: [String],
+  startDates: [Date]
 })
 
 //mongodb 内的集合是 此处模型的小写+s 即 tours

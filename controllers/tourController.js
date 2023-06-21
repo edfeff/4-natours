@@ -18,7 +18,8 @@ exports.checkBody = (req, res, next) => {
 exports.getAllTours = async (req, res) => {
   try {
     const tours = await Tour.find()
-    sendData(res, {tours})
+    res.status(200).json(
+        {status: "success", result: tours.length, data: {tours}})
   } catch (err) {
     sendErr(res, err)
   }
@@ -39,7 +40,7 @@ exports.createTour = async (req, res) => {
     const tour = await Tour.create(req.body);
     sendData(res, {tour});
   } catch (err) {
-    sendErr(req, err);
+    sendErr(res, err);
   }
 }
 exports.updateTour = async (req, res) => {
@@ -52,7 +53,7 @@ exports.updateTour = async (req, res) => {
     )
     sendData(res, {tour})
   } catch (err) {
-    sendErr(err)
+    sendErr(res, err)
   }
 
 }
