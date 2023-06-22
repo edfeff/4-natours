@@ -29,7 +29,12 @@ const tourSchema = new mongoose.Schema({
   description: String,
   imageCover: String,
   images: [String],
-  startDates: [Date]
+  startDates: [Date],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    select: false
+  }
 })
 
 //mongodb 内的集合是 此处模型的小写+s 即 tours
