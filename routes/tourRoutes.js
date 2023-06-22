@@ -10,6 +10,11 @@ router.param('json', (req, res, next, val) => {
   next();
 })
 
+//路由别名  
+//利用中间件，把请求的参数都放到中间件中处理
+router.route('/top-5-cheap')
+  .get(tourController.aliasTopTours, tourController.getAllTours)
+
 router.route("/")
   .get(tourController.getAllTours)
   .post(tourController.checkBody, tourController.createTour);

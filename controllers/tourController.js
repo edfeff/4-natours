@@ -16,6 +16,13 @@ exports.checkBody = (req, res, next) => {
   next()
 }
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5'
+  req.query.sort = '-ratingAverage,price'
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty'
+  next();
+}
+
 exports.getAllTours = async (req, res) => {
   //     const tours = await Tour.find({ duration: '51', difficulty: 'easy' })
   //     const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
