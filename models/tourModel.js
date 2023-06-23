@@ -50,10 +50,14 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 )
+// -----------------------------------------------------------
 // 虚拟字段
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 })
+
+// -----------------------------------------------------------
+// 中间件
 //  pre post hooks（save、create,find）
 // save前钩子
 tourSchema.pre('save', function (next) {
@@ -99,6 +103,10 @@ tourSchema.pre('aggregate', function () {
 tourSchema.post('aggregate', function () {
   console.log("aggregate post", this)
 })
+// 中间件结束
+// -----------------------------------------------------------
+
+
 //mongodb 内的集合是 此处模型的小写+s 即 tours
 const Tour = mongoose.model("Tour", tourSchema);
 
