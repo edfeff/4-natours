@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
 const { default: slugify } = require('slugify');
+// const validator = require('validator')
 
 const tourSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       unique: true,
-      required: [true, "tour must have name"]
+      required: [true, "tour must have name"],
+      maxlength: [100, "name长度小于100"],//字符串长度
+      minlength: [5, "name长度大于5"],
+      // validate: [validator.isAlpha, "必须是字母"]
     },
     price: {
       type: Number,
@@ -16,6 +20,8 @@ const tourSchema = new mongoose.Schema(
     rating: {
       type: Number,
       default: 4.5,
+      min: [1, 'rating 至少1'],//数字范围
+      max: [5, 'rating 最大5']
     },
     duration: {
       type: Number
@@ -23,7 +29,11 @@ const tourSchema = new mongoose.Schema(
     maxGroupSize: Number,
     difficulty: {
       type: String,
-      enum: ["easy", "medium", "difficult"]
+      // enum: ["easy", "medium", "difficult"]//枚举
+      enum: {
+        values: ["easy", "medium", "difficult"],
+        message: "必须是easy, medium, difficult"
+      }
     },
     ratingsAverage: Number,
     ratingsQuantity: Number,
@@ -43,6 +53,17 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
+    },
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          console.log("折扣验证")
+          return val < this.price
+        },
+        message: "折扣priceDiscount大于原价price"
+
+      }
     }
   },
   {
