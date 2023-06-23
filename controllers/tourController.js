@@ -69,10 +69,7 @@ exports.createTour = async (req, res) => {
 exports.updateTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,
-      {
-        new: true,
-        runValidators: true
-      }
+      { new: true, runValidators: true }
     )
     sendData(res, { tour })
   } catch (err) {
@@ -89,3 +86,50 @@ exports.deleteTour = async (req, res) => {
   }
 }
 
+exports.getTourStats = async (req, res) => {
+  try {
+    const stat = await Tour.aggregate(
+      [
+        { $match: { ratingsAverage: { $gte: 4.5 } } },
+        {
+          $group: {
+            // _id: '$difficulty', // 按照难度分组
+            _id: { $toUpper: '$difficulty' },
+            num: { $sum: 1 },
+            numRating: { $sum: '$ratingsAverage' },
+            avgRating: { $avg: '$ratingsAverage' },
+            avgPrice: { $avg: '$price' },
+            minPrice: { $min: '$price' },
+            maxPrice: { $max: '$price' },
+          }
+        },
+        { $sort: { avgPrice: 1 } },
+        { $match: { _id: { $ne: 'EASY' } } }
+      ]
+    )
+    sendData(res, stat)
+  } catch (err) {
+    sendErr(res, err)
+  }
+}
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1
+    const plan = await Tour.aggregate([
+      { $unwind: '$startDates' },
+      { $match: { startDates: { $gte: new Date(`${year}-01-01`), $lte: new Date(`${year}-12-31`), } } },
+      { $group: { _id: { $month: '$startDates' }, numTourStats: { $sum: 1 }, tour: { $push: '$name' } } },
+      { $addFields: { month: '$_id' } },
+      { $project: { _id: 0 }, },
+      { $sort: { numTourStats: -1 } },
+      { $limit: 12 }
+    ])
+
+    sendData(res, { plan })
+
+  } catch (err) {
+    sendErr(res, err)
+  }
+
+}

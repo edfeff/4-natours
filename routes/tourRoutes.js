@@ -15,6 +15,11 @@ router.param('json', (req, res, next, val) => {
 router.route('/top-5-cheap')
   .get(tourController.aliasTopTours, tourController.getAllTours)
 
+// aggr
+router.route('/tour-stats').get(tourController.getTourStats)
+router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan)
+
+// crud
 router.route("/")
   .get(tourController.getAllTours)
   .post(tourController.checkBody, tourController.createTour);
