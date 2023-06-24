@@ -1,7 +1,9 @@
 
 const Tour = require('./../models/tourModel')
 const APIFeatures = require('../utils/apiFeatures')
+const ApiError = require('../utils/appError')
 const catchAsync = require('../utils/catchAsync')
+const { isValidObjectId } = require('mongoose')
 
 const sendData = (res, data) => {
   res.status(200).json({ status: "success", data: data })
@@ -45,30 +47,53 @@ exports.getAllTours = catchAsync(
 
 exports.getTour = catchAsync(
   async (req, res, next) => {
-    const { id } = req.params;
-    const tour = await Tour.findById(id);
+    if (!isValidObjectId(req.params.id)) {
+      return next(new ApiError('没有此数据', 404))
+    }
+    const tour = await Tour.findById(req.params.id);
+    if (!tour) {
+      return next(new ApiError('没有此数据', 404))
+    }
     sendData(res, { tour })
   }
 )
 
 exports.createTour = catchAsync(
   async (req, res, next) => {
+    if (!isValidObjectId(req.params.id)) {
+      return next(new ApiError('没有此数据', 404))
+    }
     const tour = await Tour.create(req.body);
+    if (!tour) {
+      return next(new ApiError('没有此数据', 404))
+    }
     sendData(res, { tour });
   }
 )
 exports.updateTour = catchAsync(
   async (req, res, next) => {
+    if (!isValidObjectId(req.params.id)) {
+      return next(new ApiError('没有此数据', 404))
+    }
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,
       { new: true, runValidators: true }
     )
+    if (!tour) {
+      return next(new ApiError('没有此数据', 404))
+    }
     sendData(res, { tour })
   }
 )
 
 exports.deleteTour = catchAsync(
   async (req, res, next) => {
+    if (!isValidObjectId(req.params.id)) {
+      return next(new ApiError('没有此数据', 404))
+    }
     const tour = await Tour.findByIdAndDelete(req.params.id);
+    if (!tour) {
+      return next(new ApiError('没有此数据', 404))
+    }
     sendData(res, { tour })
   }
 )
