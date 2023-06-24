@@ -25,7 +25,7 @@ exports.aliasTopTours = (req, res, next) => {
 }
 
 exports.getAllTours = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
@@ -44,7 +44,7 @@ exports.getAllTours = catchAsync(
 )
 
 exports.getTour = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const { id } = req.params;
     const tour = await Tour.findById(id);
     sendData(res, { tour })
@@ -52,13 +52,13 @@ exports.getTour = catchAsync(
 )
 
 exports.createTour = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const tour = await Tour.create(req.body);
     sendData(res, { tour });
   }
 )
 exports.updateTour = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,
       { new: true, runValidators: true }
     )
@@ -67,13 +67,13 @@ exports.updateTour = catchAsync(
 )
 
 exports.deleteTour = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const tour = await Tour.findByIdAndDelete(req.params.id);
     sendData(res, { tour })
   }
 )
 exports.getTourStats = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const stat = await Tour.aggregate(
       [
         { $match: { ratingsAverage: { $gte: 4.5 } } },
@@ -97,7 +97,7 @@ exports.getTourStats = catchAsync(
   }
 )
 exports.getMonthlyPlan = catchAsync(
-  async (req, res) => {
+  async (req, res, next) => {
     const year = req.params.year * 1
     const plan = await Tour.aggregate([
       { $unwind: '$startDates' },
