@@ -47,9 +47,7 @@ exports.getAllTours = catchAsync(
 
 exports.getTour = catchAsync(
   async (req, res, next) => {
-    if (!isValidObjectId(req.params.id)) {
-      return next(new ApiError('没有此数据', 404))
-    }
+
     const tour = await Tour.findById(req.params.id);
     if (!tour) {
       return next(new ApiError('没有此数据', 404))
@@ -60,9 +58,7 @@ exports.getTour = catchAsync(
 
 exports.createTour = catchAsync(
   async (req, res, next) => {
-    if (!isValidObjectId(req.params.id)) {
-      return next(new ApiError('没有此数据', 404))
-    }
+
     const tour = await Tour.create(req.body);
     if (!tour) {
       return next(new ApiError('没有此数据', 404))
@@ -72,9 +68,7 @@ exports.createTour = catchAsync(
 )
 exports.updateTour = catchAsync(
   async (req, res, next) => {
-    if (!isValidObjectId(req.params.id)) {
-      return next(new ApiError('没有此数据', 404))
-    }
+
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,
       { new: true, runValidators: true }
     )
@@ -87,9 +81,7 @@ exports.updateTour = catchAsync(
 
 exports.deleteTour = catchAsync(
   async (req, res, next) => {
-    if (!isValidObjectId(req.params.id)) {
-      return next(new ApiError('没有此数据', 404))
-    }
+
     const tour = await Tour.findByIdAndDelete(req.params.id);
     if (!tour) {
       return next(new ApiError('没有此数据', 404))
