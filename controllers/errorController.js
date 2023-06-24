@@ -4,6 +4,7 @@ const handleCastErrorDB = err => {
   const message = `无效的字段${err.path}:${err.value}`
   return new ApiError(message, 400)
 }
+
 const handleDuplicateFieldDB = err => {
   //TODO
   // const value = err.errmsg.match(//) 利用正则从errmsg字段中取出具体错误信息 
@@ -11,6 +12,14 @@ const handleDuplicateFieldDB = err => {
 
   return new ApiError(message, 400)
 }
+
+const handleValidationErrorDB = err => {
+  //TODO
+  const errors = Object.values(err.errors).map(el => el.message)
+  const message = `部分字段没有通过验证：${errors.join(' ')}`
+  return new ApiError(message, 400)
+}
+
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -49,7 +58,11 @@ module.exports = (err, req, res, next) => {
       error = handleCastErrorDB(error)
     } else if (error.code === 11000) {//用户数据问题导致DB出错
       error = handleDuplicateFieldDB(error)
+    } if (error.name === 'ValidationError') {
+      //验证错误
+      error = handleValidationErrorDB(error)
     }
+
     sendErrorProd(error, res)
   }
 }
