@@ -1,11 +1,8 @@
 
 const Tour = require('./../models/tourModel')
 const APIFeatures = require('../utils/apiFeatures')
+const catchAsync = require('../utils/catchAsync')
 
-const sendErr = (res, err) => {
-  const message = err instanceof String ? err : err.toString()
-  res.status(400).json({ status: "fail", message: message })
-}
 const sendData = (res, data) => {
   res.status(200).json({ status: "success", data: data })
 }
@@ -27,8 +24,8 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 }
 
-exports.getAllTours = async (req, res) => {
-  try {
+exports.getAllTours = catchAsync(
+  async (req, res) => {
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
@@ -43,51 +40,40 @@ exports.getAllTours = async (req, res) => {
           tours
         }
       })
-  } catch (err) {
-    sendErr(res, err)
   }
-}
+)
 
-exports.getTour = async (req, res) => {
-  const { id } = req.params;
-  try {
+exports.getTour = catchAsync(
+  async (req, res) => {
+    const { id } = req.params;
     const tour = await Tour.findById(id);
     sendData(res, { tour })
-  } catch (err) {
-    sendErr(res, err);
   }
-}
+)
 
-exports.createTour = async (req, res) => {
-  try {
+exports.createTour = catchAsync(
+  async (req, res) => {
     const tour = await Tour.create(req.body);
     sendData(res, { tour });
-  } catch (err) {
-    sendErr(res, err);
   }
-}
-exports.updateTour = async (req, res) => {
-  try {
+)
+exports.updateTour = catchAsync(
+  async (req, res) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,
       { new: true, runValidators: true }
     )
     sendData(res, { tour })
-  } catch (err) {
-    sendErr(res, err)
   }
+)
 
-}
-exports.deleteTour = async (req, res) => {
-  try {
+exports.deleteTour = catchAsync(
+  async (req, res) => {
     const tour = await Tour.findByIdAndDelete(req.params.id);
     sendData(res, { tour })
-  } catch (err) {
-    sendErr(res, err);
   }
-}
-
-exports.getTourStats = async (req, res) => {
-  try {
+)
+exports.getTourStats = catchAsync(
+  async (req, res) => {
     const stat = await Tour.aggregate(
       [
         { $match: { ratingsAverage: { $gte: 4.5 } } },
@@ -108,13 +94,10 @@ exports.getTourStats = async (req, res) => {
       ]
     )
     sendData(res, stat)
-  } catch (err) {
-    sendErr(res, err)
   }
-}
-
-exports.getMonthlyPlan = async (req, res) => {
-  try {
+)
+exports.getMonthlyPlan = catchAsync(
+  async (req, res) => {
     const year = req.params.year * 1
     const plan = await Tour.aggregate([
       { $unwind: '$startDates' },
@@ -125,11 +108,6 @@ exports.getMonthlyPlan = async (req, res) => {
       { $sort: { numTourStats: -1 } },
       { $limit: 12 }
     ])
-
     sendData(res, { plan })
-
-  } catch (err) {
-    sendErr(res, err)
   }
-
-}
+)

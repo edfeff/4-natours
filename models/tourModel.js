@@ -58,7 +58,6 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       validate: {
         validator: function (val) {
-          console.log("折扣验证")
           return val < this.price
         },
         message: "折扣priceDiscount大于原价price"
@@ -82,27 +81,22 @@ tourSchema.virtual('durationWeeks').get(function () {
 //  pre post hooks（save、create,find）
 // save前钩子
 tourSchema.pre('save', function (next) {
-  console.log('保存前 设置slug')
+  // console.log('保存前 设置slug')
   this.slug = slugify(this.name, { lower: true })
   next();
 })
 tourSchema.pre('save', function (next) {
-  console.log('保存前 站位记录')
+  // console.log('保存前 站位记录')
   next();
 })
 
 //
 tourSchema.post('save', function (doc, next) {
-  console.log("保存成功");
+  // console.log("保存成功");
   next();
 })
 
 // query中间件
-// tourSchema.pre('find', function (next) {
-//   console.log("query中间件", this)
-//   this.find({ secretTour: { $ne: true } })
-//   next();
-// })
 // 匹配所有find前缀的钩子
 tourSchema.pre(/^find/, function (next) {
   // console.log("query开始")
@@ -111,18 +105,18 @@ tourSchema.pre(/^find/, function (next) {
   next();
 })
 tourSchema.post(/^find/, function (doc, next) {
-  console.log(`query结束，耗时${Date.now() - this.start}ms`)
+  console.log(`query耗时${Date.now() - this.start}ms`)
   next();
 })
 
 // 
 tourSchema.pre('aggregate', function () {
-  console.log("aggregate pre", this)
+  // console.log("aggregate pre", this)
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
 })
 
 tourSchema.post('aggregate', function () {
-  console.log("aggregate post", this)
+  // console.log("aggregate post", this)
 })
 // 中间件结束
 // -----------------------------------------------------------
@@ -132,13 +126,3 @@ tourSchema.post('aggregate', function () {
 const Tour = mongoose.model("Tour", tourSchema);
 
 module.exports = Tour
-// const tourTest = new Tour({
-//   name: 'woo-test',
-//   rating: 1,
-//   price: 431
-// })
-// tourTest.save().then(doc => {
-//   console.log("save ok", doc)
-// }).catch(err => {
-//   console.log("save fail", err)
-// })

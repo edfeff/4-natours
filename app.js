@@ -2,7 +2,8 @@ const express = require('express')
 const morgan = require('morgan') //HTTP request logger middleware for node.js https://www.npmjs.com/package/morgan
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
-
+const ApiError = require('./utils/appError')
+const globalErrorHandler = require('./controllers/errorController')
 
 //1>  中间件
 const app = express();
@@ -26,12 +27,8 @@ app.use('/api/v1/users', userRouter);
 
 // 默认异常处理
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `未知路径: ${req.originalUrl}`
-  })
+  next(new ApiError(`未知路径: ${req.originalUrl}`, 404))
 })
-
-
+app.use(globalErrorHandler)
 
 module.exports = app;
